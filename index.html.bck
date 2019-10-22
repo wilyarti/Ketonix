@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<!-- Sun Mar 12 19:51:55 CET 2017 -->
+<!-- Copyright Ketonix AB -->
+<!-- Michel Lundell -->
+
+<html>
+	<head>
+	<script>
+		// var nw = require("nw.gui");
+		// nw.Window.get().showDevTools();
+	</script>
+		<!--
+		<meta http-equiv="Content-Security-Policy" content="default-src &apos;self&apos; data: gap: https://ssl.gstatic.com &apos;unsafe-eval&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; media-src *; img-src &apos;self&apos; data: content:;">
+		<meta http-equiv="Content-Security-Policy" content="default-src &apos;self&apos; data: gap: https://ssl.gstatic.com &apos;unsafe-eval&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; media-src *; img-src &apos;self&apos; data: content:;">
+		-->
+		<meta name="format-detection" content="telephone=no"/>
+		<meta name="msapplication-tap-highlight" content="no"/>
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.5.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery.mobile.external-png-1.4.5.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery.mobile.icons-1.4.5.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-png-1.4.5.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-svg-1.4.5.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery.mobile.structure-1.4.5.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery.mobile.theme-1.4.5.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.css"/>
+		<link rel="stylesheet" type="text/css" href="css/jquery-ui.css"/>
+		<link rel="stylesheet" type="text/css" href="css/flipswitch-hack.css"/>
+		<link rel="stylesheet" type="text/css" href="css/datetimepicker.michel.css"/>
+		<link rel="stylesheet" type="text/css" href="css/fixes.css">
+    		<link rel="stylesheet" type="text/css" href="css/mobiscroll.custom-3.0.1.min.css"/>
+		<title>Ketonix</title>
+	</head>
+<body>
+	<!-------------------------------------------------------------------------------->
+	<!-- First Screen, "Select your Ketonix"                                        -->
+	<!-------------------------------------------------------------------------------->
+	<div data-role="page" id="home">
+		<!---------------------------------------->
+		<!-- Navigate bar, only logo            -->
+		<!---------------------------------------->
+		<div data-role="header" data-position="absolute" data-fullscreen="true">
+			<a href="#settings-panel" class="ui-btn-left" data-icon="gear" id="settings-button">Settings</a>
+			<center>
+			<img src="img/KetonixLogoMenuBar.png" height="40px"></img>
+			</center>
+			<a href="#profile-panel" class="ui-btn-right" data-icon="user" id="profile-button">Profile</a>
+		</div>
+
+		<!---------------------------------------->
+		<!-- First page content, device list    -->
+		<!---------------------------------------->
+		<div class="ui-content">
+			<center>
+			<p style="text-align:center; padding-top: 20px;">Select Profile</p>
+			<a href="#profile-panel" id="select-profile-anchor">no profile selected</a>
+			<br>
+			<p style="text-align:center; padding-top: 20px;" id="connect-device-msg">Connect your Ketonix</p>
+			<ul data-role="listview" id="deviceList" data-inset="true">
+			</ul>
+			<!-- 
+	   		<button id="refreshButton" class="ui-btn ui-btn-inline">Refresh</button>
+			<button id="disconnectButton" class="ui-btn ui-btn-inline ui-state-disabled">Disconnect</button>
+			-->
+			</center>
+			<p id="version" style="bottom:50px;left:20px;position:absolute;">2.5.0</p> 
+			<p id="help-home" style="top:50px;right:20px;position:absolute;">
+				<!-- <a href="#">Help</a> -->
+				<input type="button" id="info-button-home" data-icon="info" data-iconpos="notext" value="Icon only">
+			</p>
+		</div>
+			
+		<!---------------------------------------->
+		<!-- First page footer, three tabs      -->
+		<!---------------------------------------->
+		<div data-role="footer" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#home" data-transition="fade" class="ui-btn-active ui-state-persist">Home</a></li>
+					<li><a href="#measure" data-transition="fade">Measure</a></li>
+					<li><a href="#analyze" data-transition="fade">Analyze</a></li>
+				</ul>
+			</div><!-- /navbar -->
+		</div><!-- /footer -->
+
+
+		<div data-role="panel" id="settings-panel" data-display="overlay" data-position="left" class="settings-panel"> 
+			<div data-role="header">
+			<h1> Settings </h1>
+			<a href="#" class="ui-btn-left" data-rel="close" data-icon="carat-l" data-iconpos="notext"></a>
+			</div>
+
+
+			<style type="text/css">
+				button:hover {
+				    background: #34566d;
+				}
+				.mbsc-slider-handle-cont:nth-child(13) .mbsc-slider-handle { background: green; }
+				.mbsc-slider-handle-cont:nth-child(14) .mbsc-slider-handle { background: yellow; }
+				.mbsc-slider-handle-cont:nth-child(15) .mbsc-slider-handle { background: red; }
+				.mbsc-slider-handle-cont:nth-child(13) .mbsc-slider-tooltip { background: green; }
+				.mbsc-slider-handle-cont:nth-child(14) .mbsc-slider-tooltip { background: yellow; color: black; }
+				.mbsc-slider-handle-cont:nth-child(15) .mbsc-slider-tooltip { background: red; }
+			</style>
+
+			<div id="range-settings2" style="display:none" mbsc-enhance data-role="none">
+    				<div class="mbsc-form-group" id="range-settings" data-role="none">
+					<div class="xmbsc-form-group-title">Visual Feedback Ranges (Blue/Green/Yellow/Red)</div>
+					<div>
+					    <input id="green-range-setting" class="range-setting" type="range" data-role="none" value="25" min="0" max="100" data-tooltip="true" data-step-labels="[0, 10, 20, 30, 40, 50, 60, 70, 80 , 90 , 100]">
+					    <input id="yellow-range-setting" class="range-setting" type="range" data-role="none" value="50" min="0" max="100" />
+					    <input id="red-range-setting" class="range-setting" type="range" data-role="none" value="75" min="0" max="100" />
+					</div>
+				</div>
+			</div>
+
+			<center>
+			<div>
+			<button id="blue-factory-button" class="ui-btn ui-btn-inline">Blue</button>
+			<button id="red-factory-button" class="ui-btn ui-btn-inline">Red</button>
+			<button id="usb-factory-button" class="ui-btn ui-btn-inline">USB</button>
+			</div>
+			</center>
+
+			<button id="apply-settings-button" class="ui-btn">Apply Visual Settings</button>
+			<br/>
+			<button id="calibration-button" class="ui-btn">Calibrate</button>
+			<br/>
+			<!-- <button id="support-info-button" class="ui-btn">Support Data</button> -->
+
+
+		</div>
+
+
+		<div data-role="panel" id="profile-panel" data-display="overlay" data-position="right" class="profile-panel">
+
+			<div data-role="header">
+			<h1> Profile </h1>
+			<a href="#" class="ui-btn-right" data-rel="close" data-icon="carat-r" data-iconpos="notext"></a>
+			</div>
+			<form class="ui-filterable"> 
+				<input id="profile-autocomplete" data-type="search" placeholder="Search profiles..." class="profile-autocomplete">
+
+				<ul id="autocomplete-list" data-role="listview" data-filter="true" data-filter-reveal="true" data-input="#profile-autocomplete" class="autocomplete-list">
+				</ul>
+			</form>
+			<div data-role="collapsibleset" data-content-theme="a" data-iconpos="right" id="set">
+			<div id="add-edit-profile" data-role="collapsible">
+				<h4>Add/Edit Profile</h4>
+				<form>
+					<input type="hidden" id="profile-id" value="">
+					<input type="text" id="profile-name" placeholder="profile name" data-mini="true" length="20" size="20" speech x-webkit-speech>
+					<input type="text" id="profile-username" placeholder="username" data-mini="true" length="20" size="20" speech x-webkit-speech>
+					<input type="password" id="profile-password" placeholder="password" data-mini="true" length="20" size="20" speech x-webkit-speech>
+					<input type="number" id="profile-age" name="profile-age" data-mini="true" placeholder="Enter age" speech x-webkit-speech value="25"></input>
+
+					<label><input id="profile-smoker" type="checkbox" name="smoker" data-mini="true">Smoker</label>
+
+        				<input id="profile-gender" data-role="flipswitch" name="flip-checkbox-3" id="flip-checkbox-3" data-on-text="Male" data-off-text="Female" data-wrapper-class="custom-size-flipswitch" data-mini="true" type="checkbox" />
+
+					<label><input id="profile-donate" type="checkbox" name="anon-data" data-mini="true">Donate data to science</label>
+					
+					<select name="profile-usage" id="profile-usage" data-mini="true">
+					        <option data-mini="true" value="weightloss">Weight Loss</option>
+					        <option data-mini="true" value="sport">Sport</option>
+					        <option data-mini="true" value="diabetes">Diabetes</option>
+					        <option data-mini="true" value="epilepsy">Epilepsy</option>
+					        <option data-mini="true" value="cancer">Cancer</option>
+					        <option data-mini="true" value="alzheimer">Alzheimer</option>
+					        <option data-mini="true" value="parkinson">Parkinson</option>
+					        <option data-mini="true" value="adhd">ADHD</option>
+					        <option data-mini="true" value="fertility">Fertility</option>
+					        <option data-mini="true" value="other">Other</option>
+					</select>
+
+
+					<center>
+					<input type="button" data-inline="true" id="delete-profile-button" data-mini="true" value="Delete">
+					<input type="button" data-inline="true" id="update-profile-button" data-mini="true" value="Update">
+					<input type="button" data-inline="true" id="save-new-profile-button" data-mini="true" value="New">
+					</center>
+				</form>
+			</div> 
+			</div>
+		</div>
+
+	</div><!-- /home -->
+
+	<style>
+	a.ui-shadow {
+		-moz-box-shadow: none;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+	}
+	</style>
+
+	<!-------------------------------------------------------------------------------->
+    	<!-- Second Screen, "Measure your Dragonbreath"                                 -->
+	<!-------------------------------------------------------------------------------->
+	<div data-role="page" id="measure">
+
+		<!---------------------------------------->
+		<!-- Data-menu  | Logo | Profile-menu   -->
+		<!---------------------------------------->
+		<div data-role="header" data-position="absolute" data-fullscreen="true">
+			<a href="#data-panel" data-icon="edit" class="ui-btn-icon-bottom">Data</a>
+			<center>
+			<img src="img/KetonixLogoMenuBar.png" height="40px"></img>
+			</center>
+			<!-- <a href="#profile-panel-2" class="ui-btn-right" data-icon="alert" data-iconpos="notext" id="profile-button">Save</a> -->
+			<a href="#" class="ui-btn-right" data-icon="edit" id="save-measure-button">Save</a>
+		</div>
+
+		<!---------------------------------------->
+		<!-- Gauge and a save button            -->
+		<!---------------------------------------->
+		<div class="ui-content">
+			<p id="status-message" style="position: 'absolute'; top: '90px';  left: '40px';">-</p>
+			<div style="position: absolute; left: 50%;">
+					<div id="gaugeDiv" style="position: relative; left: -50%;">
+					<canvas id="gauge-ppm"></canvas>
+					</div>
+			</div>
+			<div id="save-measure-button-pos" style="position: relative; top: 90px; right: 40px;">
+				<!-- <input type="button" class="ui-state-disabled" data-inline="true" id="save-measure-button" data-mini="true" value="Save"> -->
+			</div>
+			<p id="help-measure" style="top:50px;right:20px;position:absolute;">
+				<!-- <a href="#">Help</a> -->
+				<input type="button" id="info-button-measure" data-icon="info" data-iconpos="notext" value="Icon only">
+			</p>
+			<!-- NEW -->
+			<center>
+			<!-- <div id="range-zoom-div" style="bottom:50px;position:absolute;left:20px;"> -->
+			<div id="range-zoom-div" style="bottom:50px;position:absolute;left:20px;">
+			<form 
+				<b>Zoom</b>&nbsp;<input type="checkbox" data-role="flipswitch" name="range-zoom" id="range-zoom" data-mini="true">
+			</form
+			</div>
+			</center>
+			<!-- END NEW -->
+		</div><!-- end measure content -->
+			
+		<!---------------------------------------->
+		<!-- Footer with the three tabs         -->
+		<!---------------------------------------->
+		<div data-role="footer" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#home" data-transition="fade">Home</a></li>
+					<li><a href="#measure"  data-transition="fade" class="ui-btn-active ui-state-persist">Measure</a></li>
+					<li><a href="#analyze" data-transition="fade" >Analyze</a></li>
+				</ul>
+			</div><!-- /navbar -->
+		</div><!-- /footer -->
+
+		<!---------------------------------------->
+		<!-- (Left) Data-menu, add additional ..-->
+		<!---------------------------------------->
+		<div data-role="panel" id="data-panel" data-display="overlay" data-position="left">
+
+			<!---------------------------------------->
+			<!-- Header 				-->
+			<!---------------------------------------->
+			<div data-role="header">
+				<h1>Data</h1>
+				<a href="#" class="ui-btn-left" data-rel="close" data-icon="carat-l" data-iconpos="notext"></a>
+			</div>
+
+
+			<!---------------------------------------->
+			<!-- Date input for all additional data -->
+			<!---------------------------------------->
+			<input size="16" id="data-timestamp" type="text" placeholder="yyyy-mm-dd HH:MM" readonly class="form_datetime"> 
+
+			<!---------------------------------------->
+			<!-- Collapsible list of additional forms -->
+			<!---------------------------------------->
+
+			<div data-role="collapsibleset" data-content-theme="a" data-iconpos="left" id="set-left">
+				<!---------------------------------------->
+				<!-- Meal Form				-->
+				<!---------------------------------------->
+				<div data-role="collapsible" data-mini="true">
+					<h4>Add Meal</h4>
+					<form>
+					<div class="ui-field-contain">
+
+						<input type="number" name="meal-fat" id="meal-fat" data-mini="true" placeholder="Fat (gr)" value="">
+						<input type="number" name="meal-protein" id="meal-protein" data-mini="true" placeholder="Protein (gr)" value="">
+						<input type="number" name="meal-carb" id="meal-carb" data-mini="true" placeholder="Carbs (gr)" value="">
+						<input type="number" name="meal-water" id="meal-water" data-mini="true" placeholder="Water (ml)" value="">
+						<input type="number" name="meal-alcohol" id="meal-alcohol" data-mini="true" placeholder="Alcohol (units)" value="">
+						<center>
+						<a href="#" name="save-meal-button" id="save-meal-button" class="ui-btn ui-btn-inline" >Save</a>
+						</center>
+					</div>
+					</form>
+				</div>
+
+				<!---------------------------------------->
+				<!-- Exercise Form			-->
+				<!---------------------------------------->
+
+
+				<div data-role="collapsible">
+					<h4>Add Exercise</h4>
+					<input type="number" name="exercise-length" id="exercise-length" data-mini="true" placeholder="Length (minutes)" value="">
+					<input type="number" name="exercise-calories" id="exercise-calories" data-mini="true" placeholder="Calories (Kcal)" value="">
+					<select name="exercise-intensity" id="exercise-intensity" data-mini="true">
+					        <option data-mini="true" value="6">6 - No exertion at all</option>
+					        <option data-mini="true" value="7">7 - Extremely light</option>
+					        <option data-mini="true" value="8">8 - Very light</option>
+					        <option data-mini="true" value="9">9 - Very light</option>
+					        <option data-mini="true" value="10">10 - Light</option>
+					        <option data-mini="true" value="11">11 - Light</option>
+					        <option data-mini="true" value="12">12 - Somewhat hard</option>
+					        <option data-mini="true" value="13">13 - Somewhat hard</option>
+					        <option data-mini="true" value="14">14 - Hard</option>
+					        <option data-mini="true" value="15">15 - Hard</option>
+					        <option data-mini="true" value="16">16 - Very hard</option>
+					        <option data-mini="true" value="17">17 - Very hard</option>
+					        <option data-mini="true" value="18">18 - Extremely hard</option>
+					        <option data-mini="true" value="19">19 - Extremely hard</option>
+					        <option data-mini="true" value="20">20 - Maximal excertion</option>
+					</select>
+
+					<select name="exercise-type" id="exercise-type" data-mini="true">
+					        <option data-mini="true" value="1">1 - Aerobic</option>
+					        <option data-mini="true" value="2">2 - Anaerobic</option>
+					        <option data-mini="true" value="3">3 - Flexibility</option>
+					</select>
+
+					<select name="exercise-fun" id="exercise-fun" data-mini="true">
+					        <option data-mini="true" value="0">Fun Factor = 0</option>
+					        <option data-mini="true" value="1">Fun Factor = 1</option>
+					        <option data-mini="true" value="2">Fun Factor = 2</option>
+					        <option data-mini="true" value="3">Fun Factor = 3</option>
+					        <option data-mini="true" value="4">Fun Factor = 4</option>
+					        <option data-mini="true" value="5">Fun Factor = 5</option>
+					        <option data-mini="true" value="6">Fun Factor = 6</option>
+					        <option data-mini="true" value="7">Fun Factor = 7</option>
+					        <option data-mini="true" value="8">Fun Factor = 8</option>
+					        <option data-mini="true" value="9">Fun Factor = 9</option>
+					        <option data-mini="true" value="10">Fun Factor = 10</option>
+					</select>
+					<center>
+					<a href="#" name="save-exercise-button" id="save-exercise-button" class="ui-btn ui-btn-inline" >Save</a>
+					</center>
+				</div>
+
+				<!---------------------------------------->
+				<!-- Body Measures Form			-->
+				<!---------------------------------------->
+				<div data-role="collapsible">
+					<h4>Add Body Measure</h4>
+					<form>
+					<input type="number" name="body-height" id="body-height" data-mini="true" placeholder="height" value="">
+					<input type="number" name="body-neck" id="body-neck" data-mini="true" placeholder="neck" value="">
+					<input type="number" name="body-upper-arm" id="body-upper-arm" data-mini="true" placeholder="upper arm" value="">
+					<input type="number" name="body-chest" id="body-chest" data-mini="true" placeholder="chest" value="">
+					<input type="number" name="body-waist" id="body-waist" data-mini="true" placeholder="waist" value="">
+					<input type="number" name="body-hips" id="body-hips" data-mini="true" placeholder="hips" value="">
+					<input type="number" name="body-thigh" id="body-thigh" data-mini="true" placeholder="thigh" value="">
+					<input type="number" name="body-calf" id="body-calf" data-mini="true" placeholder="calf" value="">
+					<input type="number" name="body-weight" id="body-weight" data-mini="true" placeholder="weight" value="">
+					<input type="number" name="body-fat" id="body-fat" data-mini="true" placeholder="body fat" value="">
+					<center>
+					<a href="#" name="save-body-measures-button" id="save-body-measures-button" class="ui-btn ui-btn-inline" >Save</a>
+					</center>
+					</form>
+				</div>
+
+				<!---------------------------------------->
+				<!-- Blood Measures Form		-->
+				<!---------------------------------------->
+				<div data-role="collapsible">
+					<h4>Add Blood Values</h4>
+					<form>
+					<input type="number" name="blood-ldl-p" id="blood-ldl-p" data-mini="true" placeholder="ldl-p" value="">
+					<input type="number" name="blood-small-ldl-p" id="blood-small-ldl-p" data-mini="true" placeholder="small ldl-p" value="">
+					<input type="number" name="blood-ldl-c" id="blood-ldl-c" data-mini="true" placeholder="ldl-c" value="">
+					<input type="number" name="blood-hdl-c" id="blood-hdl-c" data-mini="true" placeholder="hdl-c" value="">
+					<input type="number" name="blood-triglycerides" id="blood-triglycerides" data-mini="true" placeholder="triglycerides value=">
+					<input type="number" name="blood-total-cholesterol" id="blood-total-cholesterol" data-mini="true" placeholder="total cholesterol" value="">
+					<input type="number" name="blood-vldl" id="blood-vldl" data-mini="true" placeholder="vldl" value="">
+					<input type="number" name="blood-systolic" id="blood-systolic" data-mini="true" placeholder="systolic pressure" value="">
+					<input type="number" name="blood-diastolic" id="blood-diastolic" data-mini="true" placeholder="diastolic pressure" value="">
+					<input type="number" name="blood-pulse" id="blood-pulse" data-mini="true" placeholder="pulse" value="">
+					<input type="number" name="blood-beta-hydroxybutyrate" id="blood-beta-hydroxybutyrate" data-mini="true" placeholder="beta-hydroxybutyrate" value="">
+					<input type="number" name="blood-glucose" id="blood-glucose" data-mini="true" placeholder="glucose" value="">
+
+					<center>
+					<a href="#" name="save-blood-button" id="save-blood-button" class="ui-btn ui-btn-inline" >Save</a>
+					</center>
+					</form>
+				</div>
+			</div> <!-- set-left -->
+			<a id="reset-demo-data-button" class="ui-btn">Reset Demo</a>
+
+			<p>Import CSV data</p>
+			<form>
+			<input type="file" id="import-csv-file">
+			<a id="import-csv-data-button" class="ui-btn">Import</a>
+			</form>
+		</div> <!-- DATA MENU -->
+
+
+		<div id="message-dialog" data-role="dialog">
+    			<div id="myMessage"></div>
+    			<input id="message-dialog-button" type="button" value="OK" data-theme="c" onclick="#" />
+		</div>
+
+	</div><!-- /measure -->
+		
+
+	<!------------------------------------------------------>
+	<!-- Third tab : Analyze                              -->
+	<!------------------------------------------------------>
+
+	<div data-role="page" id="analyze">
+
+		<div data-role="header" data-position="absolute" data-fullscreen="true">
+			<a href="#select-data-panel" data-icon="eye" class="ui-btn-icon-bottom">View</a>
+			<center>
+			<img src="img/KetonixLogoMenuBar.png" height="40px"></img>
+			</center>
+			<!-- <a id="edit-data-points-button" data-icon="edit">Edit</a> -->
+			<a href="#edit-data-points-page" id="edit-data-points-button" data-icon="edit">Edit</a>
+		</div>
+			
+		<style>
+			.aside .ui-input-text {
+			  display:inline-block;
+			}
+		</style>
+
+		<div class="ui-content">
+			<center>
+			<table>
+				<tr>
+					<td>From</td>
+					<td><input size="10" id="analyze-from" type="text" placeholder="from yyyy-mm-dd" readonly class="form_date" size="16" maxLength="16" data-inline="true"></td>
+					<td>to</td>
+					<td><input size="10" id="analyze-to" type="text" placeholder="to yyyy-mm-dd" readonly class="form_date" size="16" maxLength="16" data-inline="true"></td>
+					<td><input type="button"  id="refresh-diagrams-button"  data-icon="refresh" data-iconpos="notext" value="Icon only" data-inline="true"></td>
+				</tr>
+			</table>
+			</center>
+
+			<ul data-role="listview" id="chartList" data-inset="true">
+			</ul>
+
+			
+			<p id="help-analyze" style="top:50px;right:20px;position:absolute;">
+				<!-- <a href="#">Help</a> -->
+				<input type="button" id="info-button-analyze" data-icon="info" data-iconpos="notext" value="Icon only">
+			</p>
+
+		</div><!-- end analyze content -->
+			
+
+
+
+		<div data-role="footer" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#home" data-transition="fade" >Home</a></li>
+					<li><a href="#measure" data-transition="fade" >Measure</a></li>
+					<li><a href="#analyze" data-transition="fade"  class="ui-btn-active ui-state-persist">Analyze</a></li>
+				</ul>
+			</div><!-- /navbar -->
+		</div><!-- /footer -->
+
+		<!---------------------------------------->
+		<!-- (Left) Data-menu, which data to chart -->
+		<!---------------------------------------->
+		<div data-role="panel" id="select-data-panel" data-display="overlay" data-position="left">
+
+			<!---------------------------------------->
+			<!-- Menu header with back button	-->
+			<!---------------------------------------->
+			<div data-role="header">
+				<h1>View Data</h1>
+				<a href="#" class="ui-btn-left" data-rel="close" data-icon="carat-l" data-iconpos="notext"></a>
+			</div>
+			<!------------------------------------------>
+			<!-- Collapsible list of additional forms -->
+			<!------------------------------------------>
+			<div data-role="collapsible">
+				<h4>Ketonix</h4>
+				<form>
+					<input type="checkbox" name="ketonix-units-checkbox" id="ketonix-units-checkbox" data-mini="true">
+					<label for="ketonix-units-checkbox">Ketonix units</label>
+					<input type="checkbox" name="ketonix-acetone-checkbox" id="ketonix-acetone-checkbox" data-mini="true">
+					<label for="ketonix-acetone-checkbox">Breath Acetone PPM</label>
+				</form>
+			</div>
+
+			<div data-role="collapsible">
+				<h4>Meal</h4>
+				<form>
+					<input type="checkbox" name="meal-fat-checkbox" id="meal-fat-checkbox" data-mini="true">
+					<label for="meal-fat-checkbox">Fat (gr)</label>
+					<input type="checkbox" name="meal-protein-checkbox" id="meal-protein-checkbox" data-mini="true" >
+					<label for="meal-protein-checkbox">Protein (gr)</label>
+					<input type="checkbox" name="meal-carb-checkbox" id="meal-carb-checkbox" data-mini="true">
+					<label for="meal-carb-checkbox">Carbs (gr)</label>
+					<input type="checkbox" name="meal-keto-ratio-checkbox" id="meal-keto-ratio-checkbox" data-mini="true">
+					<label for="meal-keto-ratio-checkbox">Keto Ratio</label>
+					<input type="checkbox" name="meal-water-checkbox" id="meal-water-checkbox" data-mini="true">
+					<label for="meal-water-checkbox">Water (ml)</label>
+					<input type="checkbox" name="meal-alcohol-checkbox" id="meal-alcohol-checkbox" data-mini="true">
+					<label for="meal-alcohol-checkbox">Alcohol (units)</label>
+				</form>
+			</div>
+
+			<div data-role="collapsible">
+				<h4>Exercise</h4>
+				<form>
+					<input type="checkbox" name="exercise-length-checkbox" id="exercise-length-checkbox" data-mini="true">
+					<label for="exercise-length-checkbox">Length (minutes)</label>
+					<input type="checkbox" name="exercise-calories-checkbox" id="exercise-calories-checkbox" data-mini="true">
+					<label for="exercise-calories-checkbox">Calories (Kcal)</label>
+					<input type="checkbox" name="exercise-intensity-checkbox" id="exercise-intensity-checkbox" data-mini="true">
+					<label for="exercise-intensity-checkbox">Intensity (Borg)</label>
+					<input type="checkbox" name="exercise-type-checkbox" id="exercise-type-checkbox" data-mini="true">
+					<label for="exercise-type-checkbox">Exercise Type</label>
+			
+					<input type="checkbox" name="exercise-fun-checkbox" id="exercise-fun-checkbox" data-mini="true">
+					<label for="exercise-fun-checkbox">Exercise Fun</label>
+				</form>
+			</div>
+
+			<div data-role="collapsible">
+				<h4>Body Measure</h4>
+				<form>
+					<input type="checkbox" name="body-height-checkbox" id="body-height-checkbox" data-mini="true">
+					<label for="body-height-checkbox">Height</label>
+
+					<input type="checkbox" name="body-neck-checkbox" id="body-neck-checkbox" data-mini="true">
+					<label for="body-neck-checkbox">Neck</label>
+					<input type="checkbox" name="body-upper-arm-checkbox" id="body-upper-arm-checkbox" data-mini="true">
+					<label for="body-upper-arm-checkbox">Upper arm</label>
+					<input type="checkbox" name="body-chest-checkbox" id="body-chest-checkbox" data-mini="true">
+					<label for="body-chest-checkbox">Chest</label>
+					<input type="checkbox" name="body-waist-checkbox" id="body-waist-checkbox" data-mini="true">
+					<label for="body-waist-checkbox">Waist</label>
+					<input type="checkbox" name="body-hips-checkbox" id="body-hips-checkbox" data-mini="true">
+					<label for="body-hips-checkbox">Hips</label>
+					<input type="checkbox" name="body-thigh-checkbox" id="body-thigh-checkbox" data-mini="true">
+					<label for="body-thigh-checkbox">Thigh</label>
+					<input type="checkbox" name="body-calf-checkbox" id="body-calf-checkbox" data-mini="true">
+					<label for="body-calf-checkbox" >Calf</label>
+					<input type="checkbox" name="body-weight-checkbox" id="body-weight-checkbox" data-mini="true">
+					<label for="body-weight-checkbox">Weight</label>
+					<input type="checkbox" name="body-fat-checkbox" id="body-fat-checkbox" data-mini="true">
+					<label for="body-fat-checkbox">Body fat</label>
+				</form>
+			</div>
+
+			<div data-role="collapsible">
+				<h4>Blood Values</h4>
+				<form>
+					<input type="checkbox" name="blood-ldl-p-checkbox" id="blood-ldl-p-checkbox" data-mini="true">
+					<label for="blood-ldl-p-checkbox">LDL-P</label>
+					<input type="checkbox" name="blood-small-ldl-p-checkbox" id="blood-small-ldl-p-checkbox" data-mini="true">
+					<label for="blood-small-ldl-p-checkbox">Small LDL-P</label>
+					<input type="checkbox" name="blood-ldl-c-checkbox" id="blood-ldl-c-checkbox" data-mini="true">
+					<label for="blood-ldl-c-checkbox">LDL-C</label>
+					<input type="checkbox" name="blood-hdl-c-checkbox" id="blood-hdl-c-checkbox" data-mini="true">
+					<label for="blood-hdl-c-checkbox">HDL-C</label>
+					<input type="checkbox" name="blood-triglycerides-checkbox" id="blood-triglycerides-checkbox" data-mini="true">
+					<label for="blood-triglycerides-checkbox">Triglycerides</label>
+					<input type="checkbox" name="blood-total-cholesterol-checkbox" id="blood-total-cholesterol-checkbox" data-mini="true">
+					<label for="blood-total-cholesterol-checkbox">Total cholesterol</label>
+					<input type="checkbox" name="blood-vldl-checkbox" id="blood-vldl-checkbox" data-mini="true">
+					<label for="blood-vldl-checkbox">VLDL</label>
+					<input type="checkbox" name="blood-systolic-checkbox" id="blood-systolic-checkbox" data-mini="true" >
+					<label for="blood-systolic-checkbox">Systolic pressure</label>
+					<input type="checkbox" name="blood-diastolic-checkbox" id="blood-diastolic-checkbox" data-mini="true" >
+					<label for="blood-diastolic-checkbox">Diastolic pressure</label>
+					<input type="checkbox" name="blood-pulse-checkbox" id="blood-pulse-checkbox" data-mini="true">
+					<label for="blood-pulse-checkbox">Pulse</label>
+					<input type="checkbox" name="blood-beta-hydroxybutyrate-checkbox" id="blood-beta-hydroxybutyrate-checkbox" data-mini="true">
+					<label for="blood-beta-hydroxybutyrate-checkbox">Beta-hydroxybutyrate</label>
+					<input type="checkbox" name="blood-glucose-checkbox" id="blood-glucose-checkbox" data-mini="true">
+					<label for="blood-glucose-checkbox">Glucose</label>
+				</form>
+			</div>
+		</div> <!-- VIEW DATA MENU -->
+
+	</div><!-- /analyze -->
+
+
+<!-- START - EDIT DATA POINTS -->
+	<div data-role="page" id="edit-data-points-page" data-display="overlay" data-position="right">
+
+		<div data-role="header">
+			<h1>Edit Data</h1>
+			<a href="#analyze" id="close-edit-data-points-button" data-rel="back" data-icon="arrow-r" data-iconpos="notext">Back</a>
+		</div><!-- /header -->
+
+		<div data-role="content">
+			<p> Swipe left to remove data point</p>
+			<ul data-role='listview' class='edit-data-point-list' id="edit-data-point-list" data-split-icon="delete" data-split-theme="a">
+			</ul>
+		</div><!-- /content -->
+	</div> <!-- panel -->
+<!-- END EDIT DATA POINTS -->
+
+
+	<!-- <script type="text/javascript" src="cordova.js"></script> -->
+	<script type="text/javascript" src="js/dateHelper.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+	<script type="text/javascript" src="js/jquery-1.11.1.min.js" id="cordova-jquery"></script>
+	<script type="text/javascript" src="js/jquery-ui.js"></script> <!-- NEW -->
+	<script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script> <!-- NEW -->
+	<script type="text/javascript" src="js/moment-with-locales.js"></script>
+	<script type="text/javascript" src="js/bootstrap-datetimepicker.js"></script>
+	<script type="text/javascript" src='js/gauge.min.js'></script>
+	<script type="text/javascript" src="js/Chart.js"></script>
+        <script type="text/javascript" src="js/jquery.blowfish.js"></script>
+        <script type="text/javascript" src="js/formatDate.js"></script>
+        <script type="text/javascript" src="js/moment-with-locales.js"></script>
+    	<script src="js/mobiscroll.custom-3.0.1.min.js" type="text/javascript"></script> 
+        <script type="text/javascript" src="js/jquery.blockUI.js"></script>
+
+	<script type="text/javascript" src="js/ketonixble.js"></script> 
+
+	</body>
+</html>

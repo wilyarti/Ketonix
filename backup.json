@@ -1,0 +1,27 @@
+{
+  "name": "Ketonix",
+  "main": "index.html",
+  "version": "2.5.0",
+  "binary.module_name": "Ketonix",
+  "binary.module_path": ".",
+  "binary.host": "localhost",
+  "dependencies": {
+    "noble": "^1.9.1",
+    "node-hid": "^0.7.9",
+    "nw-gyp": "^3.6.5",
+    "sqlite3": "^4.1.0"
+  },
+  "window": {
+    "toolbar": "true",
+    "title": "Ketonix",
+    "icon": "logo.ico",
+    "winIco": "logo.ico",
+    "frame": true,
+    "width": 800,
+    "height": 700,
+    "min_width": 400,
+    "min_height": 350,
+    "max_width": 1000,
+    "max_height": 1000
+  }
+}
